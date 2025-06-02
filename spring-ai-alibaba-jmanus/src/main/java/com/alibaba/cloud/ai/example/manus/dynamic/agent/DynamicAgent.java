@@ -50,6 +50,7 @@ import com.alibaba.cloud.ai.example.manus.recorder.PlanExecutionRecorder;
 import com.alibaba.cloud.ai.example.manus.recorder.entity.AgentExecutionRecord;
 import com.alibaba.cloud.ai.example.manus.recorder.entity.ThinkActRecord;
 import com.alibaba.cloud.ai.example.manus.tool.TerminateTool;
+import com.alibaba.cloud.ai.example.manus.tool.WaitingOperationTool;
 
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
@@ -190,7 +191,9 @@ public class DynamicAgent extends ReActAgent {
 			AgentExecResult agentExecResult = null;
 			// 如果是终止工具，则返回完成状态
 			// 否则返回运行状态
-			if (TerminateTool.name.equals(toolcallName)) {
+			if (WaitingOperationTool.NAME.equals(toolcallName)) {
+				agentExecResult = new AgentExecResult(llmCallResponse, AgentState.WAIT);
+			} else if (TerminateTool.name.equals(toolcallName)) {
 				agentExecResult = new AgentExecResult(llmCallResponse, AgentState.COMPLETED);
 			}
 			else {

@@ -41,6 +41,7 @@ import com.alibaba.cloud.ai.example.manus.tool.code.PythonExecute;
 import com.alibaba.cloud.ai.example.manus.tool.searchAPI.GoogleSearch;
 import com.alibaba.cloud.ai.example.manus.tool.textOperator.TextFileOperator;
 import com.alibaba.cloud.ai.example.manus.tool.textOperator.TextFileService;
+import com.alibaba.cloud.ai.example.manus.tool.WaitingOperationTool;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -170,6 +171,7 @@ public class PlanningFactory {
 		toolDefinitions.add(new TerminateTool(planId));
 		toolDefinitions.add(new Bash(CodeUtils.WORKING_DIR));
 		toolDefinitions.add(new DocLoaderTool());
+		toolDefinitions.add(new WaitingOperationTool());
 		toolDefinitions.add(new TextFileOperator(CodeUtils.WORKING_DIR, textFileService));
 		toolDefinitions.add(new GoogleSearch());
 		toolDefinitions.add(new PythonExecute());

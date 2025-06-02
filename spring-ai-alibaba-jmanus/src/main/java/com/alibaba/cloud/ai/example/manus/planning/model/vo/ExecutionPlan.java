@@ -154,6 +154,7 @@ public class ExecutionPlan {
 				case COMPLETED -> "[completed]";
 				case IN_PROGRESS -> "[in_progress]";
 				case BLOCKED -> "[blocked]";
+				case WAIT -> "[wait]";
 				case NOT_STARTED -> "[not_started]";
 				default -> "[ ]";
 			};

@@ -195,7 +195,7 @@ public abstract class BaseAgent {
 			state = AgentState.IN_PROGRESS;
 			agentRecord.setStatus(state.toString());
 
-			while (currentStep < maxSteps && !state.equals(AgentState.COMPLETED)) {
+			while (currentStep < maxSteps && !state.equals(AgentState.COMPLETED) && !state.equals(AgentState.WAIT)) {
 				currentStep++;
 				log.info("Executing round {}/{}", currentStep, maxSteps);
 
@@ -224,6 +224,7 @@ public abstract class BaseAgent {
 			agentRecord.setEndTime(LocalDateTime.now());
 			agentRecord.setStatus(state.toString());
 			agentRecord.setCompleted(state.equals(AgentState.COMPLETED));
+			agentRecord.setWait(state.equals(AgentState.WAIT));
 
 			// Calculate execution time in seconds
 			long executionTimeSeconds = java.time.Duration.between(agentRecord.getStartTime(), agentRecord.getEndTime())
@@ -243,7 +244,9 @@ public abstract class BaseAgent {
 			throw e; // 重新抛出异常，让上层调用者知道发生了错误
 		}
 		finally {
-			state = AgentState.COMPLETED; // Reset state after execution
+			if (state != AgentState.WAIT) {
+				state = AgentState.COMPLETED; // Reset state after execution
+			}
 
 			agentRecord.setStatus(state.toString());
 			llmService.clearAgentMemory(planId);

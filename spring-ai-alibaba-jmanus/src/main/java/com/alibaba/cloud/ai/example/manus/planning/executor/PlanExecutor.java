@@ -28,10 +28,7 @@ import com.alibaba.cloud.ai.example.manus.recorder.PlanExecutionRecorder;
 import com.alibaba.cloud.ai.example.manus.recorder.entity.PlanExecutionRecord;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,12 +82,15 @@ public class PlanExecutor {
 			recordPlanExecutionStart(context);
 			ExecutionPlan plan = context.getPlan();
 			List<ExecutionStep> steps = plan.getSteps();
-
 			if (CollectionUtil.isNotEmpty(steps)) {
 				for (ExecutionStep step : steps) {
-					BaseAgent executorinStep = executeStep(step, context);
-					if (executorinStep != null) {
-						executor = executorinStep;
+					BaseAgent executionStep = executeStep(step, context);
+					if (executionStep != null) {
+						// 如果执行结果是WAIT，则跳出循环 不要回收
+						if (executionStep.getState() == AgentState.WAIT) {
+							break;
+						}
+						executor = executionStep;
 					}
 				}
 			}

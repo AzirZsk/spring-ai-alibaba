@@ -168,7 +168,8 @@ public class BrowserUseTool implements ToolCallBiFunctionDef {
 	private final String name = "browser_use";
 
 	private final String description = """
-			与网页浏览器交互，执行各种操作，如导航、元素交互、内容提取和标签页管理。搜索类优先考虑此工具。
+			与网页浏览器交互，代替用户执行各种操作，如导航、元素交互、内容提取和标签页管理。搜索类优先考虑此工具。
+			【重要】当前页面为登录页面、验证码校验页面等需要用户手动进行操作时，不能调用此工具！
 			支持的操作包括：
 			- 'navigate'：访问特定URL，默认使用https://baidu.com
 			- 'click'：按索引点击元素

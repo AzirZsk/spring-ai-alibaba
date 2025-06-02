@@ -73,6 +73,8 @@ public class AgentExecutionRecord implements JsonSerializable {
 	// 是否卡住
 	private boolean isStuck;
 
+	private boolean isWait;
+
 	// 思考-行动步骤的记录列表，作为子步骤存在
 	private List<ThinkActRecord> thinkActSteps;
 
@@ -99,6 +101,7 @@ public class AgentExecutionRecord implements JsonSerializable {
 		this.status = "IDLE";
 		this.isCompleted = false;
 		this.isStuck = false;
+		this.isWait = false;
 		this.currentStep = 0;
 		this.thinkActSteps = new ArrayList<>();
 	}
@@ -197,6 +200,14 @@ public class AgentExecutionRecord implements JsonSerializable {
 		isStuck = stuck;
 	}
 
+	public boolean isWait() {
+		return isWait;
+	}
+
+	public void setWait(boolean wait) {
+		isWait = wait;
+	}
+
 	public List<ThinkActRecord> getThinkActSteps() {
 		return thinkActSteps;
 	}
@@ -234,8 +245,8 @@ public class AgentExecutionRecord implements JsonSerializable {
 	public String toString() {
 		return "AgentExecutionRecord{" + "id='" + id + '\'' + ", conversationId='" + conversationId + '\''
 				+ ", agentName='" + agentName + '\'' + ", status='" + status + '\'' + ", currentStep=" + currentStep
-				+ ", maxSteps=" + maxSteps + ", isCompleted=" + isCompleted + ", isStuck=" + isStuck + ", stepsCount="
-				+ (thinkActSteps != null ? thinkActSteps.size() : 0) + '}';
+				+ ", maxSteps=" + maxSteps + ", isCompleted=" + isCompleted + ", isStuck=" + isStuck + ", isWait=" + isWait
+				+ ", stepsCount=" + (thinkActSteps != null ? thinkActSteps.size() : 0) + '}';
 	}
 
 	@Override
@@ -260,6 +271,7 @@ public class AgentExecutionRecord implements JsonSerializable {
 		appendField(json, "status", status, true);
 		appendField(json, "isCompleted", isCompleted, false);
 		appendField(json, "isStuck", isStuck, false);
+		appendField(json, "isWait", isWait, false);
 		appendField(json, "agentRequest", agentRequest, true);
 		appendField(json, "result", result, true);
 		appendField(json, "errorMessage", errorMessage, true);
