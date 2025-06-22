@@ -42,7 +42,10 @@ import com.alibaba.cloud.ai.example.manus.dynamic.agent.annotation.DynamicAgentD
 				   - 使用text_file_operator进行文件操作
 				   - 任务完成时使用terminate
 				3. 优雅地处理错误
-				4. 重要：你必须在回复中使用至少一个工具才能取得进展！
+				4. 重要：
+				- 你必须在回复中使用至少一个工具才能取得进展！
+				- 从提供的工具中选择使用，可以同时使用一个工具多次或者同时使用多个工具，或混合使用。
+				- 当你能调用多次工具时，就不要只调用一次，不然会浪费很多时间！！
 
 				逐步思考：
 				1. 需要的核心操作是什么？

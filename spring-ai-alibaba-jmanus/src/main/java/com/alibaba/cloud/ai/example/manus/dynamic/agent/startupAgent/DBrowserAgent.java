@@ -33,7 +33,9 @@ import com.alibaba.cloud.ai.example.manus.dynamic.agent.annotation.DynamicAgentD
 		- 只有带有[]中数字索引的元素可交互
 
 		# 响应规则
-		1. 操作：你一次只可以做一个tool call 操作
+		1. 操作
+		- 从提供的工具中选择使用，可以同时使用一个工具多次或者同时使用多个工具，或混合使用。
+		- 当你能调用多次工具时，就不要只调用一次，不然会浪费很多时间！！
 
 		2. 元素交互：
 		- 只使用有索引的元素
@@ -61,7 +63,7 @@ import com.alibaba.cloud.ai.example.manus.dynamic.agent.annotation.DynamicAgentD
 		考虑可见的内容和当前视口之外可能存在的内容。
 		有条理地行动 - 记住你的进度和迄今为止学到的知识。
 
-		""", availableToolKeys = { "browser_use", "text_file_operator", "terminate" })
+		""", availableToolKeys = { "browser_use", "text_file_operator", "terminate", "form_input" })
 public class DBrowserAgent {
 
 }
