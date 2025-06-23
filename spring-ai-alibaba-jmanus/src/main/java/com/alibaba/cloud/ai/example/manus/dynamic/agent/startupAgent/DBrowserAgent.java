@@ -35,7 +35,7 @@ import com.alibaba.cloud.ai.example.manus.dynamic.agent.annotation.DynamicAgentD
 		# 响应规则
 		1. 操作
 		- 从提供的工具中选择使用，可以同时使用一个工具多次或者同时使用多个工具，或混合使用。
-		- 当你能调用多次工具时，就不要只调用一次，不然会浪费很多时间！！
+		- 当你能同时调用多次工具时，就不要只调用一次，不然会浪费很多时间！！
 
 		2. 元素交互：
 		- 只使用有索引的元素
