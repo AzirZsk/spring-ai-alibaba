@@ -162,12 +162,10 @@ public class DynamicAgent extends ReActAgent {
 
 			List<ToolCall> toolCalls = response.getResult().getOutput().getToolCalls();
 			String responseByLLm = response.getResult().getOutput().getText();
-
 			thinkActRecord.finishThinking(responseByLLm);
 
 			log.info(String.format("✨ %s's thoughts: %s", getName(), responseByLLm));
 			log.info(String.format("🛠️ %s selected %d tools to use", getName(), toolCalls.size()));
-
 			if (!toolCalls.isEmpty()) {
 				log.info(String.format("🧰 Tools being prepared: %s",
 						toolCalls.stream().map(ToolCall::name).collect(Collectors.toList())));
@@ -175,7 +173,7 @@ public class DynamicAgent extends ReActAgent {
 				thinkActRecord.setToolName(toolCalls.get(0).name());
 				thinkActRecord.setToolParameters(toolCalls.get(0).arguments());
 				thinkActRecord.setStatus("SUCCESS");
-
+				// Prepare act tool info
 				List<ThinkActRecord.ActToolInfo> actToolInfoList = new ArrayList<>();
 				for (ToolCall toolCall : toolCalls) {
 					ThinkActRecord.ActToolInfo actToolInfo = new ThinkActRecord.ActToolInfo(toolCall.name(),
@@ -185,10 +183,8 @@ public class DynamicAgent extends ReActAgent {
 				thinkActRecord.setActToolInfoList(actToolInfoList);
 				return true;
 			}
-
 			log.warn("Attempt {}: No tools selected. Retrying...", attempt);
 		}
-
 		thinkActRecord.setStatus("FAILED");
 		return false;
 	}
@@ -198,33 +194,22 @@ public class DynamicAgent extends ReActAgent {
 		ToolExecutionResult toolExecutionResult = null;
 		try {
 			List<ToolCall> toolCalls = response.getResult().getOutput().getToolCalls();
-			ToolCall toolCall = toolCalls.get(0);
-
-			thinkActRecord.startAction("Executing tool: " + toolCall.name(), toolCall.name(), toolCall.arguments());
+			ToolCall firstToolCall = toolCalls.get(0);
+			thinkActRecord.startAction("Executing tool: " + firstToolCall.name(), firstToolCall.name(),
+					firstToolCall.arguments());
 
 			toolExecutionResult = toolCallingManager.executeToolCalls(userPrompt, response);
 
 			processMemory(toolExecutionResult);
+			// Get current tool response
 			ToolResponseMessage toolResponseMessage = (ToolResponseMessage) toolExecutionResult.conversationHistory()
 				.get(toolExecutionResult.conversationHistory().size() - 1);
-
-			String llmCallResponse = toolResponseMessage.getResponses().get(0).responseData();
-			for (ToolResponseMessage.ToolResponse toolResponse : toolResponseMessage.getResponses()) {
-				String curToolResp = toolResponse.responseData();
-				log.info("🔧 Tool {}'s executing result: {}", getName(), curToolResp);
-				ThinkActRecord.ActToolInfo actToolInfo = thinkActRecord.getActToolInfoList()
-					.stream()
-					.filter(item -> item.getId().equals(toolResponse.id()))
-					.findFirst()
-					.orElseThrow(() -> {
-						log.warn("Tool response not found for tool id: {}", toolResponse.id());
-						return new RuntimeException("Tool response not found for tool id: " + toolResponse.id());
-					});
-				actToolInfo.setResult(curToolResp);
-			}
+			List<ToolResponseMessage.ToolResponse> responses = toolResponseMessage.getResponses();
+			setActToolInfoResult(responses);
+			String llmCallResponse = responses.get(0).responseData();
 			thinkActRecord.finishAction(llmCallResponse, "SUCCESS");
-			for (ToolCall call : toolCalls) {
-				String toolCallName = call.name();
+			for (ToolResponseMessage.ToolResponse curToolResponse : responses) {
+				String toolCallName = curToolResponse.name();
 				// Handle FormInputTool logic
 				if (FormInputTool.name.equals(toolCallName)) {
 					ToolCallBiFunctionDef formInputToolDef = getToolCallBackContext(toolCallName).getFunctionInstance();
@@ -239,8 +224,7 @@ public class DynamicAgent extends ReActAgent {
 							if (formInputTool.getInputState() == FormInputTool.InputState.INPUT_RECEIVED) {
 								log.info("User input received for planId: {}", getPlanId());
 								// The UserInputService.submitUserInputs would have
-								// updated
-								// the tool's internal state.
+								// updated the tool's internal state.
 								// We can now get the updated state string for the LLM.
 								UserMessage userMessage = UserMessage.builder()
 									.text("User input received for form: " + formInputTool.getCurrentToolStateString())
@@ -268,17 +252,36 @@ public class DynamicAgent extends ReActAgent {
 				if (TerminateTool.name.equals(toolCallName)) {
 					// Clean up any pending form
 					userInputService.removeFormInputTool(getPlanId());
-					return new AgentExecResult(llmCallResponse, AgentState.COMPLETED);
+					return new AgentExecResult(curToolResponse.responseData(), AgentState.COMPLETED);
 				}
 			}
 			return new AgentExecResult(llmCallResponse, AgentState.IN_PROGRESS);
 		}
 		catch (Exception e) {
-			log.error(e.getMessage());
+			log.error("Act exception:{}", e.getMessage());
 			thinkActRecord.recordError(e.getMessage());
 			userInputService.removeFormInputTool(getPlanId()); // Clean up on error
 			processMemory(toolExecutionResult); // Process memory even on error
 			return new AgentExecResult(e.getMessage(), AgentState.FAILED);
+		}
+	}
+
+	/**
+	 * Set act tool info result
+	 */
+	private void setActToolInfoResult(List<ToolResponseMessage.ToolResponse> responses) {
+		for (ToolResponseMessage.ToolResponse toolResponse : responses) {
+			String curToolResp = toolResponse.responseData();
+			log.info("🔧 Tool {}'s executing result: {}", getName(), curToolResp);
+			ThinkActRecord.ActToolInfo actToolInfo = thinkActRecord.getActToolInfoList()
+				.stream()
+				.filter(item -> item.getId().equals(toolResponse.id()))
+				.findFirst()
+				.orElseThrow(() -> {
+					log.warn("Tool response not found for tool id: {}", toolResponse.id());
+					return new RuntimeException("Tool response not found for tool id: " + toolResponse.id());
+				});
+			actToolInfo.setResult(curToolResp);
 		}
 	}
 
@@ -357,7 +360,7 @@ public class DynamicAgent extends ReActAgent {
 				<SystemInfo>
 				%s
 				</SystemInfo>
-				
+
 				<AgentInfo>
 				%s
 				</AgentInfo>
