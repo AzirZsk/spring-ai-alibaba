@@ -33,17 +33,10 @@ public class KeyEnterAction extends BrowserAction {
 		if (index == null) {
 			return new ToolExecuteResult("Index is required for 'key_enter' action");
 		}
-
-		Page page = getCurrentPage();
-		// 获取注册表
-		var driverWrapper = getDriverWrapper();
-		var registry = driverWrapper.getInteractiveElementRegistry();
-		// 获取目标元素
-		var elementOpt = registry.getElementById(index);
-		if (elementOpt.isEmpty()) {
+		InteractiveElement enterElement = getInteractiveElement(index);
+		if (enterElement == null) {
 			return new ToolExecuteResult("Element with index " + index + " not found");
 		}
-		InteractiveElement enterElement = elementOpt.get();
 		// 执行回车操作
 		try {
 			enterElement.getLocator().press("Enter");
