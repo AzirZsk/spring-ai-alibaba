@@ -259,7 +259,8 @@ public class DynamicAgent extends ReActAgent {
 			return new AgentExecResult(llmCallResponse, AgentState.IN_PROGRESS);
 		}
 		catch (Exception e) {
-			log.error("Act exception:{}", e.getMessage());log.info("Exception occurred", e);
+			log.error("Act exception:{}", e.getMessage());
+			log.info("Exception occurred", e);
 			thinkActRecord.recordError(e.getMessage());
 			userInputService.removeFormInputTool(getPlanId()); // Clean up on error
 			processMemory(toolExecutionResult); // Process memory even on error

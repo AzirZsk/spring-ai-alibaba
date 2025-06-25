@@ -53,7 +53,8 @@ import com.alibaba.cloud.ai.example.manus.dynamic.agent.annotation.DynamicAgentD
 				- 编程文件（.java、.py、.js）
 				- 配置文件（.xml、.json、.yaml）
 				- 日志和脚本文件（.log、.sh、.bat）
-				""", availableToolKeys = { "text_file_operator", "terminate" })
+				""",
+		availableToolKeys = { "text_file_operator", "terminate" })
 public class DTextFileAgent {
 
 }
