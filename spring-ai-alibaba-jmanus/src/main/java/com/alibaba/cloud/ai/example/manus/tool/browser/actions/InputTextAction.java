@@ -37,13 +37,10 @@ public class InputTextAction extends BrowserAction {
 		if (index == null || text == null) {
 			return new ToolExecuteResult("Index and text are required for 'input_text' action");
 		}
-		DriverWrapper driverWrapper = getDriverWrapper();
-		InteractiveElementRegistry interactiveElementRegistry = driverWrapper.getInteractiveElementRegistry();
-		Optional<InteractiveElement> elementOpt = interactiveElementRegistry.getElementById(index);
-		if (elementOpt.isEmpty()) {
+		InteractiveElement inputElement = getInteractiveElement(index);
+		if (inputElement == null) {
 			return new ToolExecuteResult("Element with index " + index + " not found");
 		}
-		InteractiveElement inputElement = elementOpt.get();
 		String tagName = inputElement.getTagName();
 		if (!"input".equals(tagName) && !"textarea".equals(tagName)) {
 			return new ToolExecuteResult("Element at index " + index + " is not an input element");
