@@ -15,11 +15,7 @@
  */
 package com.alibaba.cloud.ai.example.manus.tool.browser.actions;
 
-import java.util.List;
-import java.util.Optional;
 
-import com.alibaba.cloud.ai.example.manus.tool.browser.DriverWrapper;
-import com.alibaba.cloud.ai.example.manus.tool.browser.InteractiveElementRegistry;
 import com.microsoft.playwright.Page;
 import com.alibaba.cloud.ai.example.manus.tool.browser.BrowserUseTool;
 import com.alibaba.cloud.ai.example.manus.tool.browser.InteractiveElement;
